@@ -1,192 +1,198 @@
-// DOM Elements
-const themeToggle = document.getElementById('theme-toggle');
-const navbar = document.querySelector('.navbar');
-const contactForm = document.getElementById('contact-form');
-const filterButtons = document.querySelectorAll('.filter-btn');
-
-// Sample Data
-const projects = [
-    {
-        id: 1,
-        year: '2023',
-        title: 'Enterprise Dashboard',
-        role: 'Lead Product Manager',
-        summary: 'Led the development of a comprehensive analytics dashboard',
-        metrics: '45% increase in user engagement',
-        link: '#'
-    },
-    // Add more projects as needed
-];
-
-const skills = {
-    product: ['Product Strategy', 'User Research', 'Roadmapping', 'Agile/Scrum', 'Data Analysis', 'Figma'],
-    technical: ['SQL', 'Python', 'API Design', 'Git', 'HTML/CSS', 'JavaScript'],
-    soft: ['Leadership', 'Communication', 'Problem Solving', 'Stakeholder Management', 'Team Collaboration']
+// Intersection Observer for fade-in animations
+const observerOptions = {
+    root: null,
+    threshold: 0.1,
+    rootMargin: '0px'
 };
 
-const blogPosts = [
-    {
-        title: 'The Future of Product Management',
-        excerpt: 'Exploring emerging trends and methodologies in product management...',
-        date: 'June 1, 2025',
-        link: '#'
-    },
-    // Add more blog posts as needed
-];
-
-// Theme Toggle
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    document.documentElement.setAttribute('data-theme', newTheme);
-    themeToggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    
-    localStorage.setItem('theme', newTheme);
-}
-
-// Initialize theme
-function initializeTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-}
-
-// Navbar Scroll Effect
-function handleScroll() {
-    if (window.scrollY > 50) {
-        navbar.style.background = 'var(--light)';
-        navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-    } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.9)';
-        navbar.style.boxShadow = 'none';
-    }
-}
-
-// Project Filtering
-function filterProjects(year) {
-    const projectElements = document.querySelectorAll('.project-card');
-    projectElements.forEach(project => {
-        if (year === 'all' || project.dataset.year === year) {
-            project.style.display = 'block';
-        } else {
-            project.style.display = 'none';
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('fade-in');
+            observer.unobserve(entry.target); // Stop observing once animation is triggered
         }
     });
-}
+}, observerOptions);
 
-// Populate Projects
-function populateProjects() {
-    const workGrid = document.querySelector('.work-grid');
-    workGrid.innerHTML = projects.map(project => `
-        <div class="project-card" data-year="${project.year}">
-            <div class="project-content">
-                <h3>${project.title}</h3>
-                <p class="role">${project.role}</p>
-                <p>${project.summary}</p>
-                <p class="metrics">${project.metrics}</p>
-                <a href="${project.link}" class="project-link">Learn More →</a>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Populate Skills
-function populateSkills() {
-    const categories = ['product', 'technical', 'soft'];
-    categories.forEach(category => {
-        const grid = document.querySelector(`#${category}-skills`);
-        if (grid) {
-            grid.innerHTML = skills[category].map(skill => `
-                <div class="skill-item">
-                    <span>${skill}</span>
-                </div>
-            `).join('');
-        }
-    });
-}
-
-// Populate Blog Posts
-function populateBlog() {
-    const blogGrid = document.querySelector('.blog-grid');
-    blogGrid.innerHTML = blogPosts.map(post => `
-        <div class="blog-card">
-            <h3>${post.title}</h3>
-            <p>${post.excerpt}</p>
-            <span class="date">${post.date}</span>
-            <a href="${post.link}" class="read-more">Read More →</a>
-        </div>
-    `).join('');
-}
-
-// Form Validation
-function validateForm(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
-    
-    if (!name || !email || !message) {
-        alert('Please fill in all fields');
-        return;
-    }
-    
-    if (!isValidEmail(email)) {
-        alert('Please enter a valid email address');
-        return;
-    }
-    
-    // Here you would typically send the form data to a server
-    console.log('Form submitted:', { name, email, message });
-    alert('Thanks for your message! I\'ll get back to you soon.');
-    contactForm.reset();
-}
-
-// Email Validation
-function isValidEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-// Scroll Animation
-function initScrollAnimation() {
-    const elements = document.querySelectorAll('.section-title, .about-content, .work-grid, .skills-container, .blog-grid, .contact-form');
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, { threshold: 0.1 });
-    
-    elements.forEach(element => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(20px)';
-        element.style.transition = 'all 0.6s ease-out';
-        observer.observe(element);
-    });
-}
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    initializeTheme();
-    populateProjects();
-    populateSkills();
-    populateBlog();
-    initScrollAnimation();
+// Elements to animate
+document.querySelectorAll('.highlight-item, .timeline-content, .project-card').forEach((el) => {
+    observer.observe(el);
 });
 
-window.addEventListener('scroll', handleScroll);
-themeToggle.addEventListener('click', toggleTheme);
-contactForm.addEventListener('submit', validateForm);
+// Navbar scroll behavior
+const navbar = document.querySelector('.navbar');
+let lastScroll = 0;
+
+window.addEventListener('scroll', () => {
+    const currentScroll = window.pageYOffset;
+    
+    // Add/remove background when scrolling
+    if (currentScroll > 50) {
+        navbar.classList.add('navbar-scrolled');
+    } else {
+        navbar.classList.remove('navbar-scrolled');
+    }
+    
+    // Hide/show navbar based on scroll direction
+    if (currentScroll > lastScroll && currentScroll > 500) {
+        navbar.classList.add('navbar-hidden');
+    } else {
+        navbar.classList.remove('navbar-hidden');
+    }
+    
+    lastScroll = currentScroll;
+});
+
+// Project filtering
+const filterButtons = document.querySelectorAll('.filter-btn');
+const projectCards = document.querySelectorAll('.project-card');
 
 filterButtons.forEach(button => {
     button.addEventListener('click', () => {
+        // Remove active class from all buttons
         filterButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
-        filterProjects(button.dataset.filter);
+        
+        const filter = button.dataset.filter;
+        
+        projectCards.forEach(card => {
+            if (filter === 'all' || card.dataset.category === filter) {
+                card.style.display = 'block';
+                setTimeout(() => card.classList.add('fade-in'), 10);
+            } else {
+                card.style.display = 'none';
+                card.classList.remove('fade-in');
+            }
+        });
     });
+});
+
+// Dark mode toggle
+const themeToggle = document.getElementById('theme-toggle');
+const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+// Check for saved theme preference or default to user's system preference
+const getCurrentTheme = () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        return savedTheme;
+    }
+    return prefersDarkScheme.matches ? 'dark' : 'light';
+};
+
+// Apply theme
+const setTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+    
+    // Update toggle button icon
+    themeToggle.innerHTML = theme === 'dark' ? '🌞' : '🌙';
+};
+
+// Initialize theme
+setTheme(getCurrentTheme());
+
+// Handle toggle click
+themeToggle.addEventListener('click', () => {
+    const newTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+});
+
+// Handle system theme changes
+prefersDarkScheme.addEventListener('change', (e) => {
+    const newTheme = e.matches ? 'dark' : 'light';
+    setTheme(newTheme);
+});
+
+// Form submission
+const contactForm = document.querySelector('.contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = contactForm.querySelector('.submit-btn');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        
+        // Collect form data
+        const formData = new FormData(contactForm);
+        const data = Object.fromEntries(formData);
+        
+        try {
+            // For now, just simulate sending (replace with actual endpoint later)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Show success message
+            alert('Message sent successfully!');
+            contactForm.reset();
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Failed to send message. Please try again.');
+        } finally {
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
+        }
+    });
+}
+
+// Smooth scroll for navigation links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Add animation class to timeline items when they come into view
+const timelineItems = document.querySelectorAll('.timeline-item');
+const timelineObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('timeline-animate');
+            timelineObserver.unobserve(entry.target);
+        }
+    });
+}, {
+    threshold: 0.2
+});
+
+timelineItems.forEach(item => timelineObserver.observe(item));
+
+// Initialize metrics counters
+const metricsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const countElement = entry.target;
+            const targetValue = parseInt(countElement.dataset.target);
+            const duration = 2000; // Animation duration in milliseconds
+            const start = parseInt(countElement.innerText) || 0;
+            const increment = targetValue / (duration / 16); // Update every 16ms (60fps)
+            
+            let currentValue = start;
+            const counter = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    countElement.innerText = targetValue.toLocaleString();
+                    clearInterval(counter);
+                } else {
+                    countElement.innerText = Math.floor(currentValue).toLocaleString();
+                }
+            }, 16);
+            
+            metricsObserver.unobserve(countElement);
+        }
+    });
+}, {
+    threshold: 0.5
+});
+
+document.querySelectorAll('.metric-counter').forEach(counter => {
+    metricsObserver.observe(counter);
 });
